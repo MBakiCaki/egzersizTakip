@@ -1,6 +1,5 @@
 # egzersizTakip
 Fitness egzersizlerinin ağırlık ve tekrar bilgilerini kaydederek hatırlamaya yardımcı olan web uygulaması. Hedeflerinizi, son egzersiz verilerini ve sonraki antrenmanda yoğunluğu değiştirmek isteyip istemediğinizi takip etmenize yarar.
-Zamanla gelişimi takip eden bir özellik eklenmedi.
 
 _Uygulama ve teknik dokümantasyon: Claude Sonnet 4.6_
 
