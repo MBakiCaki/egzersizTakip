@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Egzersiz Takip</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0e0f;
+    --surface: #161618;
+    --surface2: #1e1e21;
+    --border: #2a2a2e;
+    --accent: #c8f135;
+    --text: #f0f0ee;
+    --muted: #6b6b72;
+    --danger: #ff5a5a;
+    --up: #c8f135;
+    --hold: #f0c040;
+    --down: #ff6b6b;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  /* ══ HEADER ══════════════════════════════════════ */
+  .header {
+    padding: 20px 20px 0;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .app-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 19px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    line-height: 1;
+    white-space: nowrap;
+    flex: 1;
+    font-weight: 700;
+  }
+
+  .program-switcher {
+    display: flex;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+
+  .prog-btn {
+    padding: 5px 11px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+  .prog-btn.active { background: var(--accent); border-color: var(--accent); color: #0e0e0f; }
+  .prog-btn:not(.active):hover { border-color: var(--accent); color: var(--text); }
+
+  /* ── header icon buttons ── */
+  .header-actions { display: flex; gap: 5px; flex-shrink: 0; }
+
+  .icon-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 5px 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .icon-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(200,241,53,0.07); }
+
+  /* ══ SETTINGS DROPDOWN ═══════════════════════════ */
+  .settings-wrap { position: relative; }
+
+  .settings-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: #1a1a1e;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    min-width: 230px;
+    z-index: 400;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.75);
+    overflow: hidden;
+  }
+  .settings-menu.open { display: block; }
+
+  .settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .settings-row:last-child { border-bottom: none; }
+
+  .settings-lbl {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 3px;
+  }
+  .settings-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+  }
+  .settings-act {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 6px 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .settings-act:hover { background: var(--accent); color: #0e0e0f; border-color: var(--accent); }
+
+  /* ══ SUB-HEADER NOTE ══════════════════════════════ */
+  .sub-header-row {
+    max-width: 680px;
+    margin: 0 auto 16px;
+    padding: 0 20px;
+  }
+
+  .session-note {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    outline: none;
+    resize: none;
+    line-height: 1.5;
+    min-height: 40px;
+    transition: border-color 0.15s, min-height 0.15s;
+    overflow: hidden;
+    display: block;
+  }
+  .session-note:focus { border-color: var(--accent); }
+  .session-note::placeholder { color: var(--muted); }
+
+  /* ══ ADD ROW ══════════════════════════════════════ */
+  .add-row {
+    display: flex;
+    gap: 8px;
+    max-width: 680px;
+    margin: 0 auto 20px;
+    padding: 0 20px;
+  }
+
+  .add-input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .add-input:focus { border-color: var(--accent); }
+  .add-input::placeholder { color: var(--muted); }
+
+  .add-btn {
+    background: var(--accent);
+    border: none;
+    border-radius: 6px;
+    padding: 10px 18px;
+    color: #0e0e0f;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+  }
+  .add-btn:hover { opacity: 0.85; }
+
+  /* ══ SECTION LABEL ════════════════════════════════ */
+  .section-label {
+    max-width: 680px;
+    margin: 0 auto 10px;
+    padding: 0 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ══ MOVEMENT LIST ════════════════════════════════ */
+  .movements {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  /* ── movement card ── */
+  .movement-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: visible;
+    transition: border-color 0.15s;
+    position: relative;
+  }
+  .movement-card.expanded { border-color: var(--accent); }
+
+  .name-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 14px;
+    min-height: 56px;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 8px;
+  }
+  .movement-card.expanded .name-row { border-radius: 8px 8px 0 0; }
+
+  .movement-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text);
+    word-break: break-word;
+    min-width: 0;
+    outline: none;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 1px;
+    transition: border-color 0.15s;
+  }
+  .movement-name.is-editing { border-bottom-color: var(--accent); cursor: text; }
+
+  /* ── trend ── */
+  .trend-wrap { position: relative; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .trend-badge {
+    width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: default; transition: transform 0.12s, box-shadow 0.12s; flex-shrink: 0;
+  }
+  .trend-badge svg { display: block; pointer-events: none; }
+  .trend-wrap.editable .trend-badge { cursor: pointer; box-shadow: 0 0 0 2px var(--border); }
+  .trend-wrap.editable .trend-badge:hover { transform: scale(1.08); box-shadow: 0 0 0 2px var(--accent); }
+  .badge-up   { background: rgba(200,241,53,0.15);  color: var(--up); }
+  .badge-hold { background: rgba(240,192,64,0.15);  color: var(--hold); }
+  .badge-down { background: rgba(255,107,107,0.15); color: var(--down); }
+
+  .trend-picker {
+    display: none; position: absolute; top: 46px; right: 0;
+    background: #1a1a1e; border: 1px solid var(--border); border-radius: 10px;
+    padding: 8px; gap: 8px; flex-direction: row; z-index: 200;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  }
+  .trend-picker.open { display: flex; }
+  .trend-option {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: transform 0.12s, opacity 0.12s;
+    border: 2px solid transparent; opacity: 0.4;
+  }
+  .trend-option svg { display: block; pointer-events: none; }
+  .trend-option:hover { opacity: 0.85; transform: scale(1.1); }
+  .trend-option.selected { opacity: 1; border-color: currentColor; }
+  .opt-up   { background: rgba(200,241,53,0.15);  color: var(--up); }
+  .opt-hold { background: rgba(240,192,64,0.15);  color: var(--hold); }
+  .opt-down { background: rgba(255,107,107,0.15); color: var(--down); }
+
+  /* ── edit button ── */
+  .edit-btn {
+    background: none; border: 1px solid var(--border); border-radius: 5px;
+    color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 1px; padding: 4px 8px; cursor: pointer; flex-shrink: 0; transition: all 0.15s;
+  }
+  .edit-btn:hover, .edit-btn.active { border-color: var(--accent); color: var(--accent); }
+
+  /* ── detail panel ── */
+  .detail-panel {
+    display: none; grid-template-columns: 1fr 1fr; gap: 1px;
+    background: var(--border); border-top: 1px solid var(--border);
+    border-radius: 0 0 8px 8px; overflow: hidden;
+  }
+  .movement-card.expanded .detail-panel { display: grid; }
+  .detail-cell { background: var(--surface2); padding: 14px; }
+  .detail-label {
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 8px; font-family: 'DM Mono', monospace;
+  }
+
+  .sets-input {
+    width: 100%; background: none; border: none;
+    border-bottom: 1px solid var(--border); color: var(--text);
+    font-family: 'DM Mono', monospace; font-size: 13px; line-height: 1.5;
+    padding: 4px 0; resize: none; outline: none; min-height: 48px; transition: border-color 0.15s;
+  }
+  .sets-input.editable { border-bottom-color: var(--accent); }
+
+  .weight-row { display: flex; align-items: baseline; gap: 5px; }
+  .weight-input {
+    background: none; border: none; border-bottom: 1px solid var(--border);
+    color: var(--text); font-family: 'Bebas Neue', sans-serif; font-size: 16px;
+    letter-spacing: 1px; width: 44px; outline: none; transition: border-color 0.15s;
+    -moz-appearance: textfield;
+  }
+  .weight-input::-webkit-outer-spin-button,
+  .weight-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .weight-input.editable { border-bottom-color: var(--accent); }
+  .kg-label { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+
+  /* ── delete footer ── */
+  .card-delete-row {
+    display: none; justify-content: flex-end; padding: 4px 10px 7px;
+    background: var(--surface2); border-top: 1px solid var(--border); border-radius: 0 0 8px 8px;
+  }
+  .delete-btn {
+    background: none; border: 1px solid transparent; border-radius: 5px;
+    color: var(--danger); opacity: 0.55; cursor: pointer; padding: 3px 7px;
+    font-size: 16px; line-height: 1;
+    transition: opacity 0.12s, border-color 0.12s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+    outline: none; user-select: none;
+  }
+  .delete-btn:focus  { outline: none; }
+  .delete-btn:hover  { opacity: 1; border-color: var(--danger); }
+  .delete-btn:active { opacity: 1; border-color: var(--danger); transform: scale(0.82); }
+
+  /* ══ CONFIRM POPUP ════════════════════════════════ */
+  .confirm-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.65); z-index: 500;
+    align-items: center; justify-content: center;
+  }
+  .confirm-overlay.open { display: flex; }
+  .confirm-box {
+    background: #1a1a1e; border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 24px 20px; max-width: 300px; width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7); text-align: center;
+  }
+  .confirm-icon {
+    width: 44px; height: 44px; border-radius: 50%; background: rgba(255,90,90,0.12);
+    color: var(--danger); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px;
+  }
+  .confirm-title {
+    font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
+  }
+  .confirm-name {
+    font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500;
+    color: var(--text); margin-bottom: 22px; word-break: break-word;
+  }
+  .confirm-actions { display: flex; gap: 8px; }
+  .confirm-cancel {
+    flex: 1; padding: 10px; background: none; border: 1px solid var(--border);
+    border-radius: 7px; color: var(--muted); font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 1px; cursor: pointer; transition: border-color 0.15s, color 0.15s;
+  }
+  .confirm-cancel:hover { border-color: var(--text); color: var(--text); }
+  .confirm-ok {
+    flex: 1; padding: 10px; background: var(--danger); border: none; border-radius: 7px;
+    color: #fff; font-family: 'DM Mono', monospace; font-size: 11px;
+    letter-spacing: 1px; cursor: pointer; opacity: 0.9; transition: opacity 0.15s;
+  }
+  .confirm-ok:hover { opacity: 1; }
+
+  /* ══ EMPTY STATE ══════════════════════════════════ */
+  .empty-state {
+    text-align: center; padding: 60px 0; color: var(--muted);
+    font-size: 13px; letter-spacing: 1px; font-family: 'DM Mono', monospace; display: none;
+  }
+  .empty-state.visible { display: block; }
+
+  /* ══════════════════════════════════════════════════
+     GOALS PAGE
+  ══════════════════════════════════════════════════ */
+  #goals-view { display: none; }
+
+  .goals-header {
+    display: flex; align-items: center; gap: 14px;
+    padding: 20px 20px 18px; max-width: 680px; margin: 0 auto;
+  }
+  .back-btn {
+    background: none; border: 1px solid var(--border); border-radius: 6px;
+    color: var(--muted); cursor: pointer; padding: 6px 8px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; flex-shrink: 0;
+  }
+  .back-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .goals-page-title {
+    font-family: 'Bebas Neue', sans-serif; font-size: 22px;
+    letter-spacing: 3px; color: var(--accent); line-height: 1;
+  }
+
+  .goals-list {
+    max-width: 680px; margin: 0 auto; padding: 0 20px;
+    display: flex; flex-direction: column; gap: 5px;
+  }
+
+  /* ── goal item ── */
+  .goal-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; display: flex; align-items: center;
+    transition: border-color 0.15s, opacity 0.15s;
+  }
+  .goal-item.dragging { opacity: 0.3; border-color: var(--accent); }
+  .goal-item.drag-over { border-color: var(--accent); border-style: dashed; }
+
+  .goal-drag {
+    padding: 14px 8px 14px 12px; color: var(--muted); cursor: grab;
+    flex-shrink: 0; display: flex; align-items: center;
+    opacity: 0.3; touch-action: none; transition: opacity 0.15s;
+  }
+  .goal-drag:hover { opacity: 0.7; }
+  .goal-drag:active { cursor: grabbing; opacity: 1; }
+
+  .goal-check {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 1.5px solid var(--border); flex-shrink: 0;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; margin-right: 10px;
+  }
+  .goal-check:hover { border-color: var(--accent); }
+  .goal-item.done .goal-check { background: rgba(200,241,53,0.12); border-color: var(--accent); color: var(--accent); }
+
+  .goal-body { flex: 1; min-width: 0; padding: 13px 0; }
+  .goal-text {
+    font-family: 'DM Sans', sans-serif; font-size: 14px;
+    font-weight: 400; color: var(--text); word-break: break-word;
+    line-height: 1.45; transition: color 0.2s;
+  }
+  .goal-item.done .goal-text { text-decoration: line-through; color: var(--muted); }
+
+  .goal-done-tag {
+    display: none; margin-top: 4px;
+    font-family: 'DM Mono', monospace; font-size: 8px;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--accent); opacity: 0.6;
+  }
+  .goal-item.done .goal-done-tag { display: block; }
+
+  .goal-del {
+    background: none; border: none; color: var(--danger);
+    opacity: 0.25; cursor: pointer; padding: 13px 12px;
+    font-size: 14px; line-height: 1; flex-shrink: 0;
+    transition: opacity 0.12s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+    outline: none; user-select: none;
+  }
+  .goal-del:focus  { outline: none; }
+  .goal-del:hover  { opacity: 0.85; }
+  .goal-del:active { opacity: 1; transform: scale(0.82); }
+
+  .goals-empty {
+    text-align: center; padding: 60px 0; color: var(--muted);
+    font-size: 12px; letter-spacing: 1px; font-family: 'DM Mono', monospace; display: none;
+  }
+  .goals-empty.visible { display: block; }
+
+  /* ── drag ghost ── */
+  .drag-ghost {
+    position: fixed; pointer-events: none; z-index: 999;
+    opacity: 0.88; transform: rotate(1deg) scale(1.02);
+    border-radius: 8px; background: var(--surface);
+    border: 1px solid var(--accent); box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  }
+</style>
+</head>
+<body>
+
+<!-- ── GENERIC CONFIRM POPUP ─────────────────────── -->
+<div class="confirm-overlay" id="confirmOverlay" onclick="cancelConfirm()">
+  <div class="confirm-box" onclick="event.stopPropagation()">
+    <div class="confirm-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
+        <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+      </svg>
+    </div>
+    <div class="confirm-title" id="confirmTitle">Sil</div>
+    <div class="confirm-name"  id="confirmName"></div>
+    <div class="confirm-actions">
+      <button class="confirm-cancel" onclick="cancelConfirm()">İptal</button>
+      <button class="confirm-ok"     onclick="doConfirm()">Sil</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── HIDDEN FILE INPUT (import) ────────────────── -->
+<input type="file" id="importInput" accept=".json" style="display:none" onchange="doImport(event)"/>
+
+<!-- ══════════════════════════════════════════════════
+     MAIN VIEW
+══════════════════════════════════════════════════ -->
+<div id="main-view">
+
+  <div class="header">
+    <div class="header-top">
+      <div class="app-title">EGZERSİZ TAKİP</div>
+      <div class="program-switcher">
+        <button class="prog-btn active" onclick="switchProgram(1)">GÜN 1</button>
+        <button class="prog-btn"        onclick="switchProgram(2)">GÜN 2</button>
+      </div>
+      <div class="header-actions">
+
+        <!-- Goals -->
+        <button class="icon-btn" onclick="showGoals()" title="Hedefler">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+            <line x1="4" y1="22" x2="4" y2="15"/>
+          </svg>
+        </button>
+
+        <!-- Settings -->
+        <div class="settings-wrap">
+          <button class="icon-btn" id="settingsBtn" onclick="toggleSettings(event)" title="Ayarlar">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </button>
+
+          <div class="settings-menu" id="settingsMenu" onclick="event.stopPropagation()">
+            <div class="settings-row">
+              <div>
+                <div class="settings-lbl">Versiyon</div>
+                <div class="settings-val" id="versionDisplay">—</div>
+              </div>
+            </div>
+            <div class="settings-row">
+              <div><div class="settings-lbl">Veri Aktar</div></div>
+              <button class="settings-act" onclick="doExport()">İndir</button>
+            </div>
+            <div class="settings-row">
+              <div><div class="settings-lbl">Veri Yükle</div></div>
+              <button class="settings-act" onclick="document.getElementById('importInput').click()">Yükle</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- SUB-HEADER NOTE -->
+  <div class="sub-header-row">
+    <textarea id="sessionNote" class="session-note" rows="1"
+      placeholder=""
+      oninput="autoResize(this); saveNote()"
+      onblur="saveNote()"></textarea>
+  </div>
+
+  <!-- ADD MOVEMENT -->
+  <div class="add-row">
+    <input id="newName" class="add-input" placeholder="Hareket adı…" autocomplete="off"/>
+    <button class="add-btn" onclick="addMovement()">+ Ekle</button>
+  </div>
+
+  <div class="section-label">Hareketler</div>
+  <div class="movements" id="movementList"></div>
+  <div class="empty-state" id="emptyState">Henüz hareket eklenmedi.</div>
+
+</div><!-- /main-view -->
+
+<!-- ══════════════════════════════════════════════════
+     GOALS VIEW
+══════════════════════════════════════════════════ -->
+<div id="goals-view">
+
+  <div class="goals-header">
+    <button class="back-btn" onclick="showMain()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+      </svg>
+    </button>
+    <div class="goals-page-title">Hedefler</div>
+  </div>
+
+  <div class="add-row">
+    <input id="goalInput" class="add-input" placeholder="Yeni hedef…" autocomplete="off"/>
+    <button class="add-btn" onclick="addGoal()">+ Ekle</button>
+  </div>
+
+  <div class="section-label">Liste</div>
+  <div class="goals-list" id="goalsList"></div>
+  <div class="goals-empty" id="goalsEmpty">Henüz hedef eklenmedi.</div>
+
+</div><!-- /goals-view -->
+
+<script>
+// ── SVG ICONS ────────────────────────────────────────────────────────────────
+const SVG = {
+  up:    `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`,
+  hold:  `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`,
+  down:  `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`,
+  trash: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>`,
+  grip:  `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="18" x2="16" y2="18"/></svg>`,
+  check: `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+};
+
+const BADGE_CLASS = { up: 'badge-up', hold: 'badge-hold', down: 'badge-down' };
+const OPT_CLASS   = { up: 'opt-up',   hold: 'opt-hold',   down: 'opt-down'  };
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let currentProgram = 1;
+const expandedIds  = new Set();
+const editingIds   = new Set();
+let openPickerId   = null;
+
+// ── GENERIC CONFIRM ───────────────────────────────────────────────────────────
+let confirmCb = null;
+function openConfirm(title, name, cb) {
+  confirmCb = cb;
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmName').textContent  = name;
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+function cancelConfirm() {
+  confirmCb = null;
+  document.getElementById('confirmOverlay').classList.remove('open');
+}
+function doConfirm() {
+  if (confirmCb) confirmCb();
+  cancelConfirm();
+}
+
+// ── STORAGE — movements ───────────────────────────────────────────────────────
+function storageKey() { return `liftlog_p${currentProgram}`; }
+function loadData()   { try { return JSON.parse(localStorage.getItem(storageKey())) || []; } catch { return []; } }
+function saveData(d)  { localStorage.setItem(storageKey(), JSON.stringify(d)); }
+function getData()    { return loadData(); }
+
+// ── STORAGE — note ────────────────────────────────────────────────────────────
+function noteKey()   { return `liftlog_note_p${currentProgram}`; }
+function loadNote()  { return localStorage.getItem(noteKey()) || ''; }
+function saveNote()  {
+  const el = document.getElementById('sessionNote');
+  if (el) localStorage.setItem(noteKey(), el.value);
+}
+
+// ── STORAGE — goals ───────────────────────────────────────────────────────────
+function loadGoals() { try { return JSON.parse(localStorage.getItem('liftlog_goals')) || []; } catch { return []; } }
+function saveGoals(d){ localStorage.setItem('liftlog_goals', JSON.stringify(d)); }
+function getGoals()  { return loadGoals(); }
+
+// ── AUTO-RESIZE TEXTAREA ──────────────────────────────────────────────────────
+function autoResize(el) {
+  el.style.minHeight = 'auto';
+  el.style.minHeight = el.scrollHeight + 'px';
+}
+
+// ── VERSION ───────────────────────────────────────────────────────────────────
+function initVersion() {
+  if (!localStorage.getItem('liftlog_created')) {
+    localStorage.setItem('liftlog_created', new Date().toISOString());
+  }
+  const d   = new Date(localStorage.getItem('liftlog_created'));
+  const fmt = d.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const el  = document.getElementById('versionDisplay');
+  if (el) el.textContent = `v1.0 · ${fmt}`;
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────────────────────
+let settingsOpen = false;
+function toggleSettings(e) {
+  e.stopPropagation();
+  settingsOpen = !settingsOpen;
+  document.getElementById('settingsMenu').classList.toggle('open', settingsOpen);
+  document.getElementById('settingsBtn').classList.toggle('active', settingsOpen);
+}
+function closeSettings() {
+  if (!settingsOpen) return;
+  settingsOpen = false;
+  document.getElementById('settingsMenu')?.classList.remove('open');
+  document.getElementById('settingsBtn')?.classList.remove('active');
+}
+
+// ── EXPORT ────────────────────────────────────────────────────────────────────
+function doExport() {
+  const keys = ['liftlog_p1','liftlog_p2','liftlog_note_p1','liftlog_note_p2','liftlog_goals','liftlog_created'];
+  const out  = { _v: 1 };
+  keys.forEach(k => { const v = localStorage.getItem(k); if (v !== null) out[k] = v; });
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement('a'), { href: url, download: `egzersiz-${new Date().toISOString().slice(0,10)}.json` });
+  a.click();
+  URL.revokeObjectURL(url);
+  closeSettings();
+}
+
+// ── IMPORT ────────────────────────────────────────────────────────────────────
+function doImport(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      Object.entries(data).forEach(([k, v]) => { if (k.startsWith('liftlog_')) localStorage.setItem(k, v); });
+      closeSettings();
+      initVersion();
+      loadNoteIntoField();
+      render();
+      alert('Veriler başarıyla yüklendi!');
+    } catch { alert('Geçersiz dosya formatı!'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ── PAGE NAVIGATION ───────────────────────────────────────────────────────────
+function showGoals() {
+  closeSettings();
+  document.getElementById('main-view').style.display  = 'none';
+  document.getElementById('goals-view').style.display = 'block';
+  renderGoals();
+}
+function showMain() {
+  document.getElementById('goals-view').style.display = 'none';
+  document.getElementById('main-view').style.display  = 'block';
+}
+
+// ── PROGRAM SWITCH ────────────────────────────────────────────────────────────
+function switchProgram(n) {
+  currentProgram = n;
+  openPickerId   = null;
+  document.querySelectorAll('.prog-btn').forEach((b, i) => b.classList.toggle('active', i + 1 === n));
+  loadNoteIntoField();
+  render();
+}
+
+function loadNoteIntoField() {
+  const el = document.getElementById('sessionNote');
+  if (!el) return;
+  el.value = loadNote();
+  autoResize(el);
+}
+
+// ── ADD MOVEMENT ──────────────────────────────────────────────────────────────
+function addMovement() {
+  const input = document.getElementById('newName');
+  const name  = input.value.trim();
+  if (!name) return;
+  const data = getData();
+  data.push({ id: Date.now(), name, trend: 'hold', sets: '', weight: '' });
+  saveData(data);
+  input.value = '';
+  render();
+}
+
+// ── ADD GOAL ──────────────────────────────────────────────────────────────────
+function addGoal() {
+  const input = document.getElementById('goalInput');
+  const text  = input.value.trim();
+  if (!text) return;
+  const goals = getGoals();
+  goals.push({ id: Date.now(), text, done: false });
+  saveGoals(goals);
+  input.value = '';
+  renderGoals();
+}
+
+// ── TOGGLE GOAL DONE (non-destructive) ───────────────────────────────────────
+function toggleGoalDone(id) {
+  const goals = getGoals();
+  const g     = goals.find(x => x.id === id);
+  if (!g) return;
+  g.done = !g.done;
+  saveGoals(goals);
+  // update in-place without full re-render for smooth feel
+  const item = document.querySelector(`[data-goal="${id}"]`);
+  if (item) {
+    item.classList.toggle('done', g.done);
+    const chk = item.querySelector('.goal-check');
+    if (chk) chk.innerHTML = g.done ? SVG.check : '';
+  }
+}
+
+// ── DELETE GOAL ───────────────────────────────────────────────────────────────
+function askDeleteGoal(id, e) {
+  e.stopPropagation();
+  const g = getGoals().find(x => x.id === id);
+  openConfirm('Hedefi sil', g ? g.text : '', () => {
+    saveGoals(getGoals().filter(x => x.id !== id));
+    renderGoals();
+  });
+}
+
+// ── DRAG REORDER (goals) ──────────────────────────────────────────────────────
+let drag = null;
+
+function onHandleDown(id, e) {
+  e.preventDefault();
+  const cy   = e.touches ? e.touches[0].clientY : e.clientY;
+  const item = document.querySelector(`[data-goal="${id}"]`);
+  if (!item) return;
+
+  const r     = item.getBoundingClientRect();
+  const ghost = item.cloneNode(true);
+  Object.assign(ghost.style, {
+    left: r.left + 'px', top: r.top + 'px',
+    width: r.width + 'px', height: r.height + 'px'
+  });
+  ghost.className = 'drag-ghost';
+  document.body.appendChild(ghost);
+  item.classList.add('dragging');
+
+  drag = { id, startY: cy, curY: cy, ghost, topOrigin: r.top };
+
+  document.addEventListener('touchmove', onDragMove, { passive: false });
+  document.addEventListener('touchend',  onDragEnd);
+  document.addEventListener('mousemove', onDragMove);
+  document.addEventListener('mouseup',   onDragEnd);
+}
+
+function onDragMove(e) {
+  if (!drag) return;
+  e.preventDefault();
+  const cy = e.touches ? e.touches[0].clientY : e.clientY;
+  drag.curY = cy;
+  drag.ghost.style.top = (drag.topOrigin + cy - drag.startY) + 'px';
+
+  const all = [...document.querySelectorAll('[data-goal]')];
+  all.forEach(i => i.classList.remove('drag-over'));
+  for (const i of all) {
+    if (i.classList.contains('dragging')) continue;
+    const r = i.getBoundingClientRect();
+    if (cy < r.top + r.height / 2) { i.classList.add('drag-over'); break; }
+  }
+}
+
+function onDragEnd() {
+  if (!drag) return;
+  const cy  = drag.curY;
+  const all = [...document.querySelectorAll('[data-goal]')];
+  let targetId = null;
+  for (const i of all) {
+    if (i.classList.contains('dragging')) continue;
+    const r = i.getBoundingClientRect();
+    if (cy < r.top + r.height / 2) { targetId = parseInt(i.dataset.goal); break; }
+  }
+
+  const goals = getGoals();
+  const fi    = goals.findIndex(g => g.id === drag.id);
+  if (fi >= 0) {
+    const [moved] = goals.splice(fi, 1);
+    const ti = targetId !== null ? goals.findIndex(g => g.id === targetId) : -1;
+    goals.splice(ti >= 0 ? ti : goals.length, 0, moved);
+    saveGoals(goals);
+  }
+
+  drag.ghost.remove();
+  all.forEach(i => i.classList.remove('dragging', 'drag-over'));
+  document.removeEventListener('touchmove', onDragMove);
+  document.removeEventListener('touchend',  onDragEnd);
+  document.removeEventListener('mousemove', onDragMove);
+  document.removeEventListener('mouseup',   onDragEnd);
+  drag = null;
+  renderGoals();
+}
+
+// ── PICKER ────────────────────────────────────────────────────────────────────
+function openPicker(id, e) {
+  e.stopPropagation();
+  if (!editingIds.has(id)) return;
+  if (openPickerId === id) { closePicker(); return; }
+  closePicker();
+  openPickerId = id;
+  document.querySelector(`[data-picker="${id}"]`)?.classList.add('open');
+}
+function closePicker() {
+  if (openPickerId !== null) {
+    document.querySelector(`[data-picker="${openPickerId}"]`)?.classList.remove('open');
+    openPickerId = null;
+  }
+}
+function selectTrend(id, trend, e) {
+  e.stopPropagation();
+  const data = getData(), m = data.find(x => x.id === id);
+  if (!m) return;
+  m.trend = trend; saveData(data);
+  const badge = document.querySelector(`[data-badge="${id}"]`);
+  if (badge) { badge.className = `trend-badge ${BADGE_CLASS[trend]}`; badge.innerHTML = SVG[trend]; }
+  document.querySelector(`[data-picker="${id}"]`)?.querySelectorAll('.trend-option')
+    .forEach(o => o.classList.toggle('selected', o.dataset.t === trend));
+  closePicker();
+}
+
+document.addEventListener('click', () => { closePicker(); closeSettings(); });
+
+// ── EXPAND / EDIT ─────────────────────────────────────────────────────────────
+function toggleExpand(id) {
+  if (openPickerId !== null) { closePicker(); return; }
+  if (expandedIds.has(id)) expandedIds.delete(id); else expandedIds.add(id);
+  document.querySelector(`[data-card="${id}"]`)?.classList.toggle('expanded', expandedIds.has(id));
+}
+
+function toggleEdit(id, e) {
+  e.stopPropagation(); closePicker();
+  if (editingIds.has(id)) editingIds.delete(id); else editingIds.add(id);
+  updateEditState(id);
+}
+
+function updateEditState(id) {
+  const card = document.querySelector(`[data-card="${id}"]`);
+  if (!card) return;
+  const on  = editingIds.has(id);
+  const btn = card.querySelector('.edit-btn');
+  const si  = card.querySelector('.sets-input');
+  const wi  = card.querySelector('.weight-input');
+  const tw  = card.querySelector('.trend-wrap');
+  const ne  = card.querySelector('.movement-name');
+  const dr  = card.querySelector('.card-delete-row');
+
+  btn.textContent = on ? 'DONE' : 'EDIT';
+  btn.classList.toggle('active', on);
+  if (ne) { ne.contentEditable = on ? 'true' : 'false'; ne.classList.toggle('is-editing', on); }
+  si.classList.toggle('editable', on);
+  if (on) si.removeAttribute('readonly'); else si.setAttribute('readonly', '');
+  wi.classList.toggle('editable', on);
+  if (on) wi.removeAttribute('readonly'); else wi.setAttribute('readonly', '');
+  tw.classList.toggle('editable', on);
+  if (dr) dr.style.display = on ? 'flex' : 'none';
+}
+
+function saveName(id, el) {
+  const val = el.innerText.trim(), data = getData(), m = data.find(x => x.id === id);
+  if (!m) return;
+  if (!val) { el.innerText = m.name; return; }
+  m.name = val; saveData(data);
+}
+
+function saveField(id, field, value) {
+  const data = getData(), m = data.find(x => x.id === id);
+  if (!m) return;
+  m[field] = value; saveData(data);
+}
+
+// ── DELETE MOVEMENT ───────────────────────────────────────────────────────────
+function askDelete(id, e) {
+  e.stopPropagation();
+  const m = getData().find(x => x.id === id);
+  openConfirm('Hareketi sil', m ? m.name : '', () => {
+    saveData(getData().filter(x => x.id !== id));
+    expandedIds.delete(id); editingIds.delete(id);
+    if (openPickerId === id) openPickerId = null;
+    render();
+  });
+}
+
+// ── KEYBOARD ──────────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.activeElement.id === 'newName')   addMovement();
+  if (e.key === 'Enter' && document.activeElement.id === 'goalInput') addGoal();
+  if (e.key === 'Escape') cancelConfirm();
+});
+
+// ── RENDER MOVEMENTS ──────────────────────────────────────────────────────────
+function render() {
+  const data  = getData();
+  const list  = document.getElementById('movementList');
+  const empty = document.getElementById('emptyState');
+  empty.classList.toggle('visible', data.length === 0);
+
+  list.innerHTML = data.map(m => {
+    const isExp = expandedIds.has(m.id);
+    const isEd  = editingIds.has(m.id);
+    const t     = m.trend || 'hold';
+    const opts  = ['up','hold','down'].map(o => `
+      <div class="trend-option ${OPT_CLASS[o]} ${t===o?'selected':''}" data-t="${o}" onclick="selectTrend(${m.id},'${o}',event)">${SVG[o]}</div>`).join('');
+
+    return `
+      <div class="movement-card ${isExp?'expanded':''}" data-card="${m.id}">
+        <div class="name-row" onclick="toggleExpand(${m.id})">
+          <div class="movement-name ${isEd?'is-editing':''}"
+               contenteditable="${isEd?'true':'false'}"
+               onmousedown="if(editingIds.has(${m.id})){event.stopPropagation();}"
+               onclick="if(editingIds.has(${m.id})){event.stopPropagation();}"
+               onblur="saveName(${m.id},this)"
+               onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">
+            ${escHtml(m.name)}
+          </div>
+          <div class="trend-wrap ${isEd?'editable':''}">
+            <div class="trend-badge ${BADGE_CLASS[t]}" data-badge="${m.id}" onclick="openPicker(${m.id},event)">${SVG[t]}</div>
+            <div class="trend-picker" data-picker="${m.id}" onclick="event.stopPropagation()">${opts}</div>
+          </div>
+          <button class="edit-btn ${isEd?'active':''}" onclick="toggleEdit(${m.id},event)">${isEd?'DONE':'EDIT'}</button>
+        </div>
+        <div class="detail-panel">
+          <div class="detail-cell">
+            <div class="detail-label">SETS &amp; REPS</div>
+            <textarea class="sets-input ${isEd?'editable':''}" rows="2"
+              onclick="event.stopPropagation()"
+              oninput="saveField(${m.id},'sets',this.value)"
+              ${isEd?'':'readonly'}>${escHtml(m.sets||'')}</textarea>
+          </div>
+          <div class="detail-cell">
+            <div class="detail-label">WEIGHT</div>
+            <div class="weight-row">
+              <input type="number" class="weight-input ${isEd?'editable':''}"
+                value="${m.weight||''}" onclick="event.stopPropagation()"
+                oninput="saveField(${m.id},'weight',this.value)"
+                ${isEd?'':'readonly'}/>
+              <span class="kg-label">kg</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-delete-row" style="display:${isEd?'flex':'none'}">
+          <button class="delete-btn" onclick="askDelete(${m.id},event)" title="Sil">✕</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── RENDER GOALS ──────────────────────────────────────────────────────────────
+function renderGoals() {
+  const goals = getGoals();
+  const list  = document.getElementById('goalsList');
+  const empty = document.getElementById('goalsEmpty');
+  if (!list) return;
+  empty.classList.toggle('visible', goals.length === 0);
+
+  list.innerHTML = goals.map(g => `
+    <div class="goal-item ${g.done?'done':''}" data-goal="${g.id}">
+      <div class="goal-drag"
+           onmousedown="onHandleDown(${g.id},event)"
+           ontouchstart="onHandleDown(${g.id},event)">${SVG.grip}</div>
+      <div class="goal-check" onclick="toggleGoalDone(${g.id})">${g.done?SVG.check:''}</div>
+      <div class="goal-body">
+        <div class="goal-text">${escHtml(g.text)}</div>
+        <div class="goal-done-tag">tamamlandı ✓</div>
+      </div>
+      <button class="goal-del" onclick="askDeleteGoal(${g.id},event)">✕</button>
+    </div>`).join('');
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+initVersion();
+loadNoteIntoField();
+render();
+</script>
+</body>
+</html>
